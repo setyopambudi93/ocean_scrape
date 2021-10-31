@@ -1,5 +1,4 @@
 import json
-
 import requests
 from bs4 import BeautifulSoup
 import os
@@ -14,10 +13,10 @@ header = {
 url = 'https://www.indeed.com/jobs?'
 site = 'https://www.indeed.com'
 
-def get_total_pages():
+def get_total_pages(query, location):
     params = {
-        'q': 'Virtual assistant',
-        'l': 'New York State'
+        'q': query,
+        'l': location
     }
 
     req = requests.get(url, params=params, headers=header)
@@ -44,10 +43,11 @@ def get_total_pages():
     return total
 
 
-def get_all_item():
+def get_all_item(query, location, start, page):
     params = {
-        'q': 'Virtual assistant',
-        'l': 'New York State'
+        'q': query,
+        'l': location,
+        'start': start
     }
 
     req = requests.get(url, params=params, headers=header)
@@ -85,27 +85,53 @@ def get_all_item():
     except FileExistsError:
         pass
 
-    with open('json_result/job_list.json', 'w+') as json_data:
+    with open(f'json_result/{query}_in_{location}_page_{page}.json', 'w+') as json_data:
         json.dump(new_list, json_data)
     print('Json has been created')
+    return new_list
+
+    # create csv
 
 
-    #     data = {
-    #         'Job Title': job_seeker,
-    #         'Company Name': company,
-    #         'Location': location
-    #     }
-    #     new_list.append(data)
-    # return new_list
+def create_document(dataFrame, filename):
+    try:
+        os.mkdir('data_result')
+    except FileExistsError:
+        pass
+
+    df = pd.DataFrame(dataFrame)
+    df.to_csv(f'data_result/{filename}.csv', index=False)
+    df.to_excel(f'data_result/{filename}.xlsx', index=False)
+
+    # generate
+    print(f'{filename}.csv and {filename}.xlsx has been created')
+
+def run():
+    query = input('Enter your query : ')
+    location = input('Enter your location : ')
+
+    total = get_total_pages(query, location)
+    counter = 0
+    final_result = []
+    for page in range(total):
+        page += 1
+        counter += 10
+        final_result += get_all_item(query, location, counter, page)
+
+    # formatting data
+    try:
+        os.mkdir('reports')
+    except FileExistsError:
+        pass
+
+    with open('reports/{}.json'.format(query), 'w+') as final_data:
+        json.dump(final_result, final_data)
+
+    print('Data created')
+
+    # created document
+    create_document(final_result, query)
 
 
-# def create_document(dataframe, filename):
-#     df = pd.DataFrame(dataframe)
-#     df.to_csv(f'{filename}.csv')
-#     df.to_excel(f'{filename}.xlsx')
-#
-#
-#
-#
 if __name__ == '__main__':
-    get_all_item()
+    run()
