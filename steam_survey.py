@@ -30,32 +30,47 @@ def videocard():
     url = 'https://store.steampowered.com/hwsurvey/videocard/'
     req = requests.get(url, headers=header)
     soup = BeautifulSoup(req.text, 'html.parser')
-    # all_video_cards = soup.find_all('div', attrs={'id': 'sub_stats'})
-    distribusi_0 = soup.find_all('div', 'substats_row row_0')
-    distribusi_1 = soup.find_all('div', 'substats_row row_1')
-    listrik.append(distribusi_0 + distribusi_1)
-    print(listrik)
+    rows = soup.find_all('div', 'substats_row')
+    for row in rows:
+        distribution = row.find('div', 'substats_col_left').text
+        mounth = row.find_all('div', 'substats_col_month')
+        juni = mounth[0:4][0].text
+        juli = mounth[0:4][1].text
+        aug = mounth[0:4][2].text
+        sept = mounth[0:4][3].text
+        oct = row.find('div', 'substats_col_month_last_pct').text
+        percent = row.find('div', 'substats_col_month_last_chg').text
 
-    # for dis in distribusi:
-    #     busi = dis.find('div', 'substats_col_left')
-    #     juni = dis.find('div', 'substats_col_month')
-    #     oktober = dis.find('div', 'substats_col_month_last_pct')
-    #     print(busi)
+        data_dict = {
+            'OVERALL DISTRIBUTION OF CARDS': distribution,
+            'JUN': juni,
+            'JUL': juli,
+            'AUG': aug,
+            'SEPT': sept,
+            'OCT': oct,
+            'Percent': percent
+        }
+        print(data_dict)
 
+    # for row in rows:
+    #     subtat = row.find('div', 'substats_col_left')
+    #     month = [r.text.strip() for r in row.find_all('div', 'substats_col_month')] + [
+    #         row.find('div', 'substats_col_month_last_pct').text.strip()
+    #         + ' '
+    #         + row.find('div', 'substats_col_month_last_chg').text.strip()
+    #     ]
+    #
+    #     data_dict = {
+    #         'Overal': subtat,
+    #         'Juni': month[0],
+    #         'Juli': month[1],
+    #         'August': month[2],
+    #         'Sept': month[3],
+    #         'Oct': month[4],
+    #         'Percent': month[4].split(' ')[1]
 
-
-
-
-
-
-
-
-
-
-
-
-
-
+        # }
+        # print(data_dict)
 
 
 def get_item():
