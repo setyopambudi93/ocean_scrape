@@ -1,5 +1,7 @@
 import requests
 from bs4 import BeautifulSoup
+import pandas as pd
+
 
 header = {
     'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) '
@@ -23,8 +25,10 @@ def get_link():
             'Link': link
         }
         list_link.append(link)
-
-    return list_link
+    print(list_link[0])
+    # df = pd.DataFrame(list_link)
+    # df.to_csv('linknya.csv', index=False)
+    # return list_link
 listrik = []
 def videocard():
     url = 'https://store.steampowered.com/hwsurvey/videocard/'
@@ -42,7 +46,7 @@ def videocard():
         percent = row.find('div', 'substats_col_month_last_chg').text
 
         data_dict = {
-            'OVERALL DISTRIBUTION OF CARDS': distribution,
+            'OVERALL DISTRIBUTION OF CARDS AND ALL VIDEOCARD': distribution,
             'JUN': juni,
             'JUL': juli,
             'AUG': aug,
@@ -50,7 +54,11 @@ def videocard():
             'OCT': oct,
             'Percent': percent
         }
-        print(data_dict)
+        listrik.append(data_dict)
+    df = pd.DataFrame(listrik)
+    df.to_csv('survey.csv', index=False)
+    df = pd.DataFrame(listrik)
+    df.to_excel('survey.xlsx', index=False)
 
     # for row in rows:
     #     subtat = row.find('div', 'substats_col_left')
@@ -87,4 +95,4 @@ def get_item():
 
 
 if __name__ == '__main__':
-    videocard()
+    get_link()
